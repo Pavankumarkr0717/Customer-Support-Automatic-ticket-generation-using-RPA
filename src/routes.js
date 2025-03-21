@@ -35,82 +35,172 @@ Coded by www.creative-tim.com
   10. The `component` key is used to store the component of its route.
 */
 
-// Material Dashboard 2 React layouts
-import Dashboard from "layouts/dashboard";
-import Tables from "layouts/tables";
-import Billing from "layouts/billing";
-import Notifications from "layouts/notifications";
-import Profile from "layouts/profile";
+/**
+=========================================================
+* Customer Support System - Bus and Train Ticket Booking
+=========================================================
+*/
+
+// Customer layouts
+import CustomerDashboard from "layouts/customer/dashboard";
+import Bookings from "layouts/customer/bookings";
+import SupportTickets from "layouts/customer/support-tickets";
+import CreateTicket from "layouts/customer/create-ticket";
+import ChatSupport from "layouts/customer/chat-support";
+import ContactUs from "layouts/customer/contact-us";
+import CustomerProfile from "layouts/customer/profile";
+
+// Admin layouts
+import AdminDashboard from "layouts/admin/dashboard";
+import TicketManagement from "layouts/admin/ticket-management";
+import AssignedTickets from "layouts/admin/assigned-tickets";
+import CustomerManagement from "layouts/admin/customer-management";
+import AdminProfile from "layouts/admin/profile";
+
+// Authentication
 import SignIn from "layouts/authentication/sign-in";
 import SignUp from "layouts/authentication/sign-up";
-import Requests from "layouts/requests";
 
 // @mui icons
 import Icon from "@mui/material/Icon";
 
-const routes = [
+const customerRoutes = [
   {
     type: "collapse",
     name: "Dashboard",
-    key: "dashboard",
+    key: "customer-dashboard",
     icon: <Icon fontSize="small">dashboard</Icon>,
-    route: "/dashboard",
-    component: <Dashboard />,
+    route: "/customer/dashboard",
+    component: CustomerDashboard,
   },
   {
     type: "collapse",
-    name: "Requests",
-    key: "requests",
+    name: "My Bookings",
+    key: "my-bookings",
+    icon: <Icon fontSize="small">confirmation_number</Icon>,
+    route: "/customer/bookings",
+    component: Bookings,
+  },
+  {
+    type: "collapse",
+    name: "Support Tickets",
+    key: "support-tickets",
+    icon: <Icon fontSize="small">support</Icon>,
+    route: "/customer/tickets",
+    component: SupportTickets,
+  },
+  {
+    type: "collapse",
+    name: "Create Ticket",
+    key: "create-ticket",
+    icon: <Icon fontSize="small">add_circle</Icon>,
+    route: "/customer/create-ticket",
+    component: CreateTicket,
+  },
+  {
+    type: "collapse",
+    name: "Chat Support",
+    key: "chat-support",
     icon: <Icon fontSize="small">chat</Icon>,
-    route: "/requests",
-    component: <Requests />,
+    route: "/customer/chat",
+    component: ChatSupport,
   },
   {
     type: "collapse",
-    name: "Tables",
-    key: "tables",
-    icon: <Icon fontSize="small">table_view</Icon>,
-    route: "/tables",
-    component: <Tables />,
-  },
-  {
-    type: "collapse",
-    name: "Billing",
-    key: "billing",
-    icon: <Icon fontSize="small">receipt_long</Icon>,
-    route: "/billing",
-    component: <Billing />,
-  },
-  {
-    type: "collapse",
-    name: "Notifications",
-    key: "notifications",
-    icon: <Icon fontSize="small">notifications</Icon>,
-    route: "/notifications",
-    component: <Notifications />,
+    name: "Contact Us",
+    key: "contact-us",
+    icon: <Icon fontSize="small">contact_support</Icon>,
+    route: "/customer/contact",
+    component: ContactUs,
   },
   {
     type: "collapse",
     name: "Profile",
-    key: "profile",
+    key: "customer-profile",
     icon: <Icon fontSize="small">person</Icon>,
-    route: "/profile",
-    component: <Profile />,
+    route: "/customer/profile",
+    component: CustomerProfile,
   },
+  {
+    type: "divider",
+  },
+  {
+    type: "collapse",
+    name: "Logout",
+    key: "logout",
+    icon: <Icon fontSize="small">logout</Icon>,
+    route: "/authentication/sign-in",
+  },
+];
+
+const adminRoutes = [
+  {
+    type: "collapse",
+    name: "Admin Dashboard",
+    key: "admin-dashboard",
+    icon: <Icon fontSize="small">dashboard</Icon>,
+    route: "/admin/dashboard",
+    component: AdminDashboard,
+  },
+  {
+    type: "collapse",
+    name: "Ticket Management",
+    key: "ticket-management",
+    icon: <Icon fontSize="small">assignment</Icon>,
+    route: "/admin/tickets",
+    component: TicketManagement,
+  },
+  {
+    type: "collapse",
+    name: "My Assigned Tickets",
+    key: "assigned-tickets",
+    icon: <Icon fontSize="small">work</Icon>,
+    route: "/admin/assigned-tickets",
+    component: AssignedTickets,
+  },
+  {
+    type: "collapse",
+    name: "Customer Management",
+    key: "customer-management",
+    icon: <Icon fontSize="small">people</Icon>,
+    route: "/admin/customers",
+    component: CustomerManagement,
+  },
+  {
+    type: "collapse",
+    name: "Profile",
+    key: "admin-profile",
+    icon: <Icon fontSize="small">person</Icon>,
+    route: "/admin/profile",
+    component: AdminProfile,
+  },
+  {
+    type: "divider",
+  },
+  {
+    type: "collapse",
+    name: "Logout",
+    key: "logout",
+    icon: <Icon fontSize="small">logout</Icon>,
+    route: "/authentication/sign-in",
+  },
+];
+
+const authRoutes = [
   {
     type: "route",
     name: "Sign In",
     key: "sign-in",
     route: "/authentication/sign-in",
-    component: <SignIn />,
+    component: SignIn,
   },
   {
     type: "route",
     name: "Sign Up",
     key: "sign-up",
     route: "/authentication/sign-up",
-    component: <SignUp />,
+    component: SignUp,
   },
 ];
 
-export default routes;
+export { customerRoutes, adminRoutes, authRoutes };

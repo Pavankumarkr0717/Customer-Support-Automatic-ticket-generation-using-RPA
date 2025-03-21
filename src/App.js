@@ -1,40 +1,21 @@
 /**
 =========================================================
-* Material Dashboard 2 React - v2.2.0
+* Customer Support System - Bus and Train Ticket Booking
 =========================================================
-
-* Product Page: https://www.creative-tim.com/product/material-dashboard-react
-* Copyright 2023 Creative Tim (https://www.creative-tim.com)
-
-Coded by www.creative-tim.com
-
- =========================================================
-
-* The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
 */
 
 import { useState, useEffect, useMemo } from "react";
-
-// react-router components
 import { Routes, Route, Navigate, useLocation } from "react-router-dom";
-
-// @mui material components
 import { ThemeProvider } from "@mui/material/styles";
 import CssBaseline from "@mui/material/CssBaseline";
 import Icon from "@mui/material/Icon";
-
-// Material Dashboard 2 React components
 import MDBox from "components/MDBox";
-
-// Material Dashboard 2 React example components
 import Sidenav from "examples/Sidenav";
 import Configurator from "examples/Configurator";
 
-// Material Dashboard 2 React themes
+// Themes
 import theme from "assets/theme";
 import themeRTL from "assets/theme/theme-rtl";
-
-// Material Dashboard 2 React Dark Mode themes
 import themeDark from "assets/theme-dark";
 import themeDarkRTL from "assets/theme-dark/theme-rtl";
 
@@ -43,18 +24,16 @@ import rtlPlugin from "stylis-plugin-rtl";
 import { CacheProvider } from "@emotion/react";
 import createCache from "@emotion/cache";
 
-// Material Dashboard 2 React routes
-import routes from "routes";
+// Routes
+import { customerRoutes, adminRoutes, authRoutes } from "routes";
 
-// Material Dashboard 2 React contexts
+// Contexts
 import { useMaterialUIController, setMiniSidenav, setOpenConfigurator } from "context";
+import { useAuth } from "context/auth";
 
 // Images
 import brandWhite from "assets/images/logo-ct.png";
 import brandDark from "assets/images/logo-ct-dark.png";
-
-// Auth Check component
-import AuthCheck from "components/AuthCheck";
 
 export default function App() {
   const [controller, dispatch] = useMaterialUIController();
@@ -71,6 +50,7 @@ export default function App() {
   const [onMouseEnter, setOnMouseEnter] = useState(false);
   const [rtlCache, setRtlCache] = useState(null);
   const { pathname } = useLocation();
+  const { isAuthenticated, user } = useAuth();
 
   // Cache for the rtl
   useMemo(() => {
@@ -78,11 +58,10 @@ export default function App() {
       key: "rtl",
       stylisPlugins: [rtlPlugin],
     });
-
     setRtlCache(cacheRtl);
   }, []);
 
-  // Open sidenav when mouse enter on mini sidenav
+  // Sidenav handlers
   const handleOnMouseEnter = () => {
     if (miniSidenav && !onMouseEnter) {
       setMiniSidenav(dispatch, false);
@@ -90,7 +69,6 @@ export default function App() {
     }
   };
 
-  // Close sidenav when mouse leave mini sidenav
   const handleOnMouseLeave = () => {
     if (onMouseEnter) {
       setMiniSidenav(dispatch, true);
@@ -98,31 +76,28 @@ export default function App() {
     }
   };
 
-  // Change the openConfigurator state
   const handleConfiguratorOpen = () => setOpenConfigurator(dispatch, !openConfigurator);
 
-  // Setting the dir attribute for the body element
   useEffect(() => {
     document.body.setAttribute("dir", direction);
   }, [direction]);
 
-  // Setting page scroll to 0 when changing the route
   useEffect(() => {
     document.documentElement.scrollTop = 0;
     document.scrollingElement.scrollTop = 0;
   }, [pathname]);
 
-  const getRoutes = (allRoutes) =>
-    allRoutes.map((route) => {
+  const getRoutes = (routes) =>
+    routes.flatMap((route) => {
       if (route.collapse) {
         return getRoutes(route.collapse);
       }
 
       if (route.route) {
-        return <Route exact path={route.route} element={route.component} key={route.key} />;
+        return <Route exact path={route.route} element={<route.component />} key={route.key} />;
       }
 
-      return null;
+      return [];
     });
 
   const configsButton = (
@@ -149,41 +124,82 @@ export default function App() {
     </MDBox>
   );
 
-  const appContent = (
-    <>
-      {layout === "dashboard" && (
+  const renderContent = () => {
+    if (!isAuthenticated) {
+      return (
+        <MDBox>
+          <Routes>
+            {getRoutes(authRoutes)}
+            <Route path="*" element={<Navigate to="/authentication/sign-in" />} />
+          </Routes>
+        </MDBox>
+      );
+    }
+
+    if (user?.role === "admin") {
+      return (
         <>
           <Sidenav
             color={sidenavColor}
             brand={(transparentSidenav && !darkMode) || whiteSidenav ? brandDark : brandWhite}
-            brandName="CS-AI"
-            routes={routes}
+            brandName="Admin Portal"
+            routes={adminRoutes}
             onMouseEnter={handleOnMouseEnter}
             onMouseLeave={handleOnMouseLeave}
           />
-          <Configurator />
-          {configsButton}
+          <MDBox sx={{ p: 3, minHeight: "100vh", ml: "250px" }}>
+            <Routes>
+              {getRoutes(adminRoutes)}
+              <Route path="*" element={<Navigate to="/admin/dashboard" />} />
+            </Routes>
+          </MDBox>
         </>
-      )}
-      {layout === "vr" && <Configurator />}
-      <Routes>
-        {getRoutes(routes)}
-        <Route path="*" element={<Navigate to="/authentication/sign-in" />} />
-      </Routes>
-    </>
-  );
+      );
+    }
+
+    return (
+      <>
+        <Sidenav
+          color={sidenavColor}
+          brand={(transparentSidenav && !darkMode) || whiteSidenav ? brandDark : brandWhite}
+          brandName="Customer Support"
+          routes={customerRoutes}
+          onMouseEnter={handleOnMouseEnter}
+          onMouseLeave={handleOnMouseLeave}
+        />
+        <MDBox sx={{ p: 3, minHeight: "100vh", ml: "250px" }}>
+          <Routes>
+            {getRoutes(customerRoutes)}
+            <Route path="*" element={<Navigate to="/customer/dashboard" />} />
+          </Routes>
+        </MDBox>
+      </>
+    );
+  };
 
   return direction === "rtl" ? (
     <CacheProvider value={rtlCache}>
       <ThemeProvider theme={darkMode ? themeDarkRTL : themeRTL}>
         <CssBaseline />
-        <AuthCheck>{appContent}</AuthCheck>
+        {renderContent()}
+        {layout === "dashboard" && (
+          <>
+            <Configurator />
+            {configsButton}
+          </>
+        )}
       </ThemeProvider>
     </CacheProvider>
   ) : (
     <ThemeProvider theme={darkMode ? themeDark : theme}>
       <CssBaseline />
-      <AuthCheck>{appContent}</AuthCheck>
+      {renderContent()}
+      {layout === "dashboard" && (
+        <>
+          <Configurator />
+          {configsButton}
+        </>
+      )}
     </ThemeProvider>
   );
 }
