@@ -44,6 +44,8 @@ const MDButton = forwardRef(
   }
 );
 
+MDButton.displayName = "MDButton";
+
 // Setting default values for the props of MDButton
 MDButton.defaultProps = {
   size: "medium",

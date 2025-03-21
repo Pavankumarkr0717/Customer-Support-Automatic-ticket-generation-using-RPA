@@ -163,12 +163,10 @@ function CustomerManagement() {
                 </MDTypography>
                 <MDBox display="flex" gap={2}>
                   <MDButton variant="gradient" color="dark" size="small">
-                    <Icon>filter_list</Icon>&nbsp;
-                    Filter
+                    <Icon>filter_list</Icon>&nbsp; Filter
                   </MDButton>
                   <MDButton variant="gradient" color="dark" size="small">
-                    <Icon>download</Icon>&nbsp;
-                    Export
+                    <Icon>download</Icon>&nbsp; Export
                   </MDButton>
                 </MDBox>
               </MDBox>

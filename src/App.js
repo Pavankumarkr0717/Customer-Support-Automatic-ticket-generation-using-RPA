@@ -8,10 +8,9 @@ import { useState, useEffect, useMemo } from "react";
 import { Routes, Route, Navigate, useLocation } from "react-router-dom";
 import { ThemeProvider } from "@mui/material/styles";
 import CssBaseline from "@mui/material/CssBaseline";
-import Icon from "@mui/material/Icon";
 import MDBox from "components/MDBox";
 import Sidenav from "examples/Sidenav";
-import Configurator from "examples/Configurator";
+import ChatBot from "components/ChatBot";
 
 // Themes
 import theme from "assets/theme";
@@ -28,7 +27,7 @@ import createCache from "@emotion/cache";
 import { customerRoutes, adminRoutes, authRoutes } from "routes";
 
 // Contexts
-import { useMaterialUIController, setMiniSidenav, setOpenConfigurator } from "context";
+import { useMaterialUIController, setMiniSidenav } from "context";
 import { useAuth } from "context/auth";
 
 // Images
@@ -41,7 +40,6 @@ export default function App() {
     miniSidenav,
     direction,
     layout,
-    openConfigurator,
     sidenavColor,
     transparentSidenav,
     whiteSidenav,
@@ -51,8 +49,8 @@ export default function App() {
   const [rtlCache, setRtlCache] = useState(null);
   const { pathname } = useLocation();
   const { isAuthenticated, user } = useAuth();
+  const [isChatOpen, setIsChatOpen] = useState(false);
 
-  // Cache for the rtl
   useMemo(() => {
     const cacheRtl = createCache({
       key: "rtl",
@@ -61,7 +59,6 @@ export default function App() {
     setRtlCache(cacheRtl);
   }, []);
 
-  // Sidenav handlers
   const handleOnMouseEnter = () => {
     if (miniSidenav && !onMouseEnter) {
       setMiniSidenav(dispatch, false);
@@ -75,8 +72,6 @@ export default function App() {
       setOnMouseEnter(false);
     }
   };
-
-  const handleConfiguratorOpen = () => setOpenConfigurator(dispatch, !openConfigurator);
 
   useEffect(() => {
     document.body.setAttribute("dir", direction);
@@ -100,29 +95,7 @@ export default function App() {
       return [];
     });
 
-  const configsButton = (
-    <MDBox
-      display="flex"
-      justifyContent="center"
-      alignItems="center"
-      width="3.25rem"
-      height="3.25rem"
-      bgColor="white"
-      shadow="sm"
-      borderRadius="50%"
-      position="fixed"
-      right="2rem"
-      bottom="2rem"
-      zIndex={99}
-      color="dark"
-      sx={{ cursor: "pointer" }}
-      onClick={handleConfiguratorOpen}
-    >
-      <Icon fontSize="small" color="inherit">
-        settings
-      </Icon>
-    </MDBox>
-  );
+  const chatButton = <ChatBot isOpen={isChatOpen} onClose={(state) => setIsChatOpen(state)} />;
 
   const renderContent = () => {
     if (!isAuthenticated) {
@@ -182,24 +155,14 @@ export default function App() {
       <ThemeProvider theme={darkMode ? themeDarkRTL : themeRTL}>
         <CssBaseline />
         {renderContent()}
-        {layout === "dashboard" && (
-          <>
-            <Configurator />
-            {configsButton}
-          </>
-        )}
+        {layout === "dashboard" && chatButton}
       </ThemeProvider>
     </CacheProvider>
   ) : (
     <ThemeProvider theme={darkMode ? themeDark : theme}>
       <CssBaseline />
       {renderContent()}
-      {layout === "dashboard" && (
-        <>
-          <Configurator />
-          {configsButton}
-        </>
-      )}
+      {layout === "dashboard" && chatButton}
     </ThemeProvider>
   );
 }

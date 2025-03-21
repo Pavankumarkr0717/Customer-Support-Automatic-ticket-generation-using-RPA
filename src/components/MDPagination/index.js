@@ -63,6 +63,8 @@ const MDPagination = forwardRef(
   }
 );
 
+MDPagination.displayName = "MDPagination";
+
 // Setting default values for the props of MDPagination
 MDPagination.defaultProps = {
   item: false,

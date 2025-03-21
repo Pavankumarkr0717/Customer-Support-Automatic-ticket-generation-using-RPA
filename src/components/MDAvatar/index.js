@@ -25,6 +25,8 @@ const MDAvatar = forwardRef(({ bgColor, size, shadow, ...rest }, ref) => (
   <MDAvatarRoot ref={ref} ownerState={{ shadow, bgColor, size }} {...rest} />
 ));
 
+MDAvatar.displayName = "MDAvatar";
+
 // Setting default values for the props of MDAvatar
 MDAvatar.defaultProps = {
   bgColor: "transparent",

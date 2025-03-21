@@ -150,8 +150,7 @@ function AdminProfile() {
                     </Grid>
                     <Grid item xs={12}>
                       <MDButton type="submit" variant="gradient" color="info">
-                        <Icon>save</Icon>&nbsp;
-                        Save Changes
+                        <Icon>save</Icon>&nbsp; Save Changes
                       </MDButton>
                     </Grid>
                   </Grid>

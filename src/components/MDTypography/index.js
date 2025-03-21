@@ -52,6 +52,8 @@ const MDTypography = forwardRef(
   }
 );
 
+MDTypography.displayName = "MDTypography";
+
 // Setting default values for the props of MDTypography
 MDTypography.defaultProps = {
   color: "dark",

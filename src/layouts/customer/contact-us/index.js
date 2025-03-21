@@ -145,8 +145,7 @@ function ContactUs() {
                     </Grid>
                     <Grid item xs={12}>
                       <MDButton type="submit" variant="gradient" color="info">
-                        <Icon>send</Icon>&nbsp;
-                        Send Message
+                        <Icon>send</Icon>&nbsp; Send Message
                       </MDButton>
                     </Grid>
                   </Grid>
@@ -173,7 +172,9 @@ function ContactUs() {
               <MDBox p={3}>
                 {contactInfo.map((item, index) => (
                   <MDBox display="flex" py={2} alignItems="center" key={index}>
-                    <Icon color="info" sx={{ fontSize: "24px", mr: 1 }}>{item.icon}</Icon>
+                    <Icon color="info" sx={{ fontSize: "24px", mr: 1 }}>
+                      {item.icon}
+                    </Icon>
                     <MDTypography variant="body2">{item.content}</MDTypography>
                   </MDBox>
                 ))}
