@@ -23,8 +23,9 @@ import rtlPlugin from "stylis-plugin-rtl";
 import { CacheProvider } from "@emotion/react";
 import createCache from "@emotion/cache";
 
-// Routes
-import { customerRoutes, adminRoutes, authRoutes } from "routes";
+// Routes [Uncomment this when auth is implemented]
+//import { customerRoutes, adminRoutes, authRoutes } from "routes";
+import { customerRoutes, adminRoutes /* eslint-disable-line no-unused-vars */ } from "routes";
 
 // Contexts
 import { useMaterialUIController, setMiniSidenav } from "context";
@@ -48,7 +49,9 @@ export default function App() {
   const [onMouseEnter, setOnMouseEnter] = useState(false);
   const [rtlCache, setRtlCache] = useState(null);
   const { pathname } = useLocation();
-  const { isAuthenticated, user } = useAuth();
+  // [Uncomment this when auth is implemented]
+  //const { isAuthenticated, user } = useAuth();
+  const { isAuthenticated /* eslint-disable-line no-unused-vars */, user } = useAuth();
   const [isChatOpen, setIsChatOpen] = useState(false);
 
   useMemo(() => {
@@ -98,16 +101,16 @@ export default function App() {
   const chatButton = <ChatBot isOpen={isChatOpen} onClose={(state) => setIsChatOpen(state)} />;
 
   const renderContent = () => {
-    if (!isAuthenticated) {
-      return (
-        <MDBox>
-          <Routes>
-            {getRoutes(authRoutes)}
-            <Route path="*" element={<Navigate to="/authentication/sign-in" />} />
-          </Routes>
-        </MDBox>
-      );
-    }
+    // if (!isAuthenticated) {
+    //   return (
+    //     <MDBox>
+    //       <Routes>
+    //         {getRoutes(authRoutes)}
+    //         <Route path="*" element={<Navigate to="/authentication/sign-in" />} />
+    //       </Routes>
+    //     </MDBox>
+    //   );
+    // }
 
     if (user?.role === "admin") {
       return (

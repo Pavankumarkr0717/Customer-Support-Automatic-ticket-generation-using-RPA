@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 // @mui material components
 import Grid from "@mui/material/Grid";
@@ -20,11 +20,11 @@ import Footer from "examples/Footer";
 
 function CustomerProfile() {
   const [formData, setFormData] = useState({
-    firstName: "John",
-    lastName: "Doe",
-    email: "john.doe@example.com",
-    phone: "+1 (555) 123-4567",
-    address: "123 Main Street, City, Country",
+    firstName: "",
+    lastName: "",
+    email: "",
+    phone: "",
+    address: "",
   });
 
   const [notification, setNotification] = useState({
@@ -33,6 +33,20 @@ function CustomerProfile() {
     type: "success",
   });
 
+  useEffect(() => {
+    // Get user data from localStorage
+    const userData = JSON.parse(localStorage.getItem("user_data"));
+    if (userData) {
+      setFormData({
+        firstName: userData.username || "", // Use username for firstName
+        lastName: "",
+        email: userData.email || "", // Use email from user data
+        phone: userData.phone || "",
+        address: userData.address || "",
+      });
+    }
+  }, []);
+
   const handleChange = (e) => {
     setFormData({
       ...formData,
@@ -40,14 +54,50 @@ function CustomerProfile() {
     });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Add profile update logic here
-    setNotification({
-      open: true,
-      message: "Profile updated successfully!",
-      type: "success",
-    });
+    try {
+      const token = localStorage.getItem("access_token");
+      const response = await fetch("http://127.0.0.1:8000/users/profile", {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          ...formData,
+          username: formData.firstName, // Map firstName back to username when updating
+        }),
+      });
+
+      if (response.ok) {
+        // Update localStorage with new data
+        const updatedUserData = JSON.parse(localStorage.getItem("user_data"));
+        localStorage.setItem(
+          "user_data",
+          JSON.stringify({
+            ...updatedUserData,
+            username: formData.firstName,
+            email: formData.email,
+            phone: formData.phone,
+            address: formData.address,
+          })
+        );
+        setNotification({
+          open: true,
+          message: "Profile updated successfully!",
+          type: "success",
+        });
+      } else {
+        throw new Error("Failed to update profile");
+      }
+    } catch (error) {
+      setNotification({
+        open: true,
+        message: "Failed to update profile. Please try again.",
+        type: "error",
+      });
+    }
   };
 
   const handleCloseNotification = () => {

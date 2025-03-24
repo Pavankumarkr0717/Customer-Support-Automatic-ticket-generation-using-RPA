@@ -1,24 +1,18 @@
-/**
-=========================================================
-* Material Dashboard 2 React - v2.2.0
-=========================================================
-
-* Product Page: https://www.creative-tim.com/product/material-dashboard-react
-* Copyright 2023 Creative Tim (https://www.creative-tim.com)
-
-Coded by www.creative-tim.com
-
- =========================================================
-
-* The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
-*/
-
 import { useState } from "react";
+
+// react-router-dom components
 import { Link, useNavigate } from "react-router-dom";
 
 // @mui material components
 import Card from "@mui/material/Card";
 import Switch from "@mui/material/Switch";
+import Grid from "@mui/material/Grid";
+import MuiLink from "@mui/material/Link";
+
+// @mui icons
+import FacebookIcon from "@mui/icons-material/Facebook";
+import GitHubIcon from "@mui/icons-material/GitHub";
+import GoogleIcon from "@mui/icons-material/Google";
 
 // Material Dashboard 2 React components
 import MDBox from "components/MDBox";
@@ -38,12 +32,68 @@ import { useAuth } from "context/auth";
 function SignIn() {
   const navigate = useNavigate();
   const { login } = useAuth();
-  const [isAdmin, setIsAdmin] = useState(false);
+  const [rememberMe, setRememberMe] = useState(false);
+  const [formData, setFormData] = useState({
+    username: "",
+    password: "",
+  });
+  const [error, setError] = useState("");
 
-  const handleSubmit = (e) => {
+  const handleSetRememberMe = () => setRememberMe(!rememberMe);
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    login(isAdmin ? "admin" : "customer");
-    navigate(isAdmin ? "/admin/dashboard" : "/customer/dashboard");
+    setError("");
+
+    try {
+      const response = await fetch("http://127.0.0.1:8000/auth/token", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded",
+        },
+        body: new URLSearchParams({
+          username: formData.username,
+          password: formData.password,
+        }),
+      });
+
+      if (response.status === 200) {
+        const data = await response.json();
+        // Store access token
+        localStorage.setItem("access_token", data.access_token);
+        // Get user data
+        const userResponse = await fetch("http://127.0.0.1:8000/auth/me", {
+          headers: {
+            Authorization: `Bearer ${data.access_token}`,
+          },
+        });
+        if (userResponse.ok) {
+          const userData = await userResponse.json();
+          // Store user data separately
+          localStorage.setItem("user_data", JSON.stringify(userData));
+          console.log(userData);
+          // Update auth context with token and user data
+          login(data.access_token, userData);
+          // Navigate based on user role
+          navigate(userData.role === "admin" ? "/admin/dashboard" : "/customer/dashboard");
+        } else {
+          throw new Error("Failed to get user data");
+        }
+      } else {
+        const errorData = await response.json();
+        setError(errorData.detail || "Login failed");
+      }
+    } catch (err) {
+      setError("Failed to connect to server");
+    }
   };
 
   return (
@@ -63,36 +113,68 @@ function SignIn() {
           <MDTypography variant="h4" fontWeight="medium" color="white" mt={1}>
             Sign in
           </MDTypography>
+          <Grid container spacing={3} justifyContent="center" sx={{ mt: 1, mb: 2 }}>
+            <Grid item xs={2}>
+              <MDTypography component={MuiLink} href="#" variant="body1" color="white">
+                <FacebookIcon color="inherit" />
+              </MDTypography>
+            </Grid>
+            <Grid item xs={2}>
+              <MDTypography component={MuiLink} href="#" variant="body1" color="white">
+                <GitHubIcon color="inherit" />
+              </MDTypography>
+            </Grid>
+            <Grid item xs={2}>
+              <MDTypography component={MuiLink} href="#" variant="body1" color="white">
+                <GoogleIcon color="inherit" />
+              </MDTypography>
+            </Grid>
+          </Grid>
         </MDBox>
         <MDBox pt={4} pb={3} px={3}>
           <MDBox component="form" role="form" onSubmit={handleSubmit}>
             <MDBox mb={2}>
               <MDInput
-                type="email"
-                label="Email"
-                value={isAdmin ? "admin@example.com" : "john.doe@example.com"}
+                type="text"
+                label="Username"
+                name="username"
+                value={formData.username}
+                onChange={handleChange}
                 fullWidth
-                disabled
+                required
               />
             </MDBox>
             <MDBox mb={2}>
-              <MDInput type="password" label="Password" value="********" fullWidth disabled />
+              <MDInput
+                type="password"
+                label="Password"
+                name="password"
+                value={formData.password}
+                onChange={handleChange}
+                fullWidth
+                required
+              />
             </MDBox>
+            {error && (
+              <MDTypography variant="caption" color="error" display="block" mb={2}>
+                {error}
+              </MDTypography>
+            )}
             <MDBox display="flex" alignItems="center" ml={-1}>
-              <Switch checked={isAdmin} onChange={() => setIsAdmin(!isAdmin)} />
+              <Switch checked={rememberMe} onChange={handleSetRememberMe} />
               <MDTypography
                 variant="button"
                 fontWeight="regular"
                 color="text"
-                onClick={() => setIsAdmin(!isAdmin)}
+                onClick={handleSetRememberMe}
                 sx={{ cursor: "pointer", userSelect: "none", ml: -1 }}
               >
-                Login as Admin
+                &nbsp;&nbsp;Remember me
               </MDTypography>
             </MDBox>
             <MDBox mt={4} mb={1}>
-              <MDButton variant="gradient" color="info" type="submit" fullWidth>
-                sign in
+              <MDButton type="submit" variant="gradient" color="info" fullWidth>
+                Sign in
               </MDButton>
             </MDBox>
             <MDBox mt={3} mb={1} textAlign="center">

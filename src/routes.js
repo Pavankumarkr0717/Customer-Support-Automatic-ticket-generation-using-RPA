@@ -64,6 +64,13 @@ import SignUp from "layouts/authentication/sign-up";
 // @mui icons
 import Icon from "@mui/material/Icon";
 
+const handleLogout = () => {
+  localStorage.removeItem("access_token");
+  localStorage.removeItem("user_role");
+  localStorage.removeItem("userData");
+  window.location.href = "/authentication/sign-in";
+};
+
 const customerRoutes = [
   {
     type: "collapse",
@@ -129,7 +136,7 @@ const customerRoutes = [
     name: "Logout",
     key: "logout",
     icon: <Icon fontSize="small">logout</Icon>,
-    route: "/authentication/sign-in",
+    onClick: handleLogout,
   },
 ];
 
@@ -182,7 +189,7 @@ const adminRoutes = [
     name: "Logout",
     key: "logout",
     icon: <Icon fontSize="small">logout</Icon>,
-    route: "/authentication/sign-in",
+    onClick: handleLogout,
   },
 ];
 
