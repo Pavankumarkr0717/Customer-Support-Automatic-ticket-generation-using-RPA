@@ -11,6 +11,7 @@ import CssBaseline from "@mui/material/CssBaseline";
 import MDBox from "components/MDBox";
 import Sidenav from "examples/Sidenav";
 import ChatBot from "components/ChatBot";
+import Feedback from "components/Feedback";
 
 // Themes
 import theme from "assets/theme";
@@ -159,6 +160,7 @@ export default function App() {
         <CssBaseline />
         {renderContent()}
         {layout === "dashboard" && chatButton}
+        <Feedback />
       </ThemeProvider>
     </CacheProvider>
   ) : (
@@ -166,6 +168,7 @@ export default function App() {
       <CssBaseline />
       {renderContent()}
       {layout === "dashboard" && chatButton}
+      <Feedback />
     </ThemeProvider>
   );
 }

@@ -90,9 +90,9 @@ const customerRoutes = [
   },
   {
     type: "collapse",
-    name: "Support Tickets",
+    name: "View Tickets",
     key: "support-tickets",
-    icon: <Icon fontSize="small">support</Icon>,
+    icon: <Icon fontSize="small">visibility</Icon>,
     route: "/customer/tickets",
     component: SupportTickets,
   },
