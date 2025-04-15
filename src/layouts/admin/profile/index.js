@@ -21,47 +21,50 @@ import DashboardNavbar from "examples/Navbars/DashboardNavbar";
 import Footer from "examples/Footer";
 
 const getLevelInfo = (skillPoints) => {
-  if (typeof skillPoints !== 'number' || skillPoints < 0) {
-    return { 
-      level: 'B',
-      color: "#A9A9A9", 
-      stars: 0, 
+  if (typeof skillPoints !== "number" || skillPoints < 0) {
+    return {
+      level: "B",
+      color: "#A9A9A9",
+      stars: 0,
       nextLevel: 5,
-      shape: "polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%)" // Hexagon shape for Bronze
+      shape: "polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%)", // Hexagon shape for Bronze
     };
   }
-  
-  if (skillPoints >= 100) return { 
-    level: 'D',
-    color: "#B9F2FF",
-    gradient: "linear-gradient(135deg, #B9F2FF, #00BFFF, #B9F2FF)",
-    stars: 100,
-    nextLevel: null,
-    shape: "polygon(50% 0%, 100% 38%, 82% 100%, 18% 100%, 0% 38%)" // Diamond shape
-  };
-  if (skillPoints >= 80) return { 
-    level: 'P',
-    color: "#E6E6FA",
-    gradient: "linear-gradient(135deg, #E6E6FA, #9370DB, #E6E6FA)",
-    stars: 80,
-    nextLevel: 100,
-    shape: "polygon(50% 0%, 90% 20%, 100% 60%, 75% 100%, 25% 100%, 0% 60%, 10% 20%)" // Platinum shield
-  };
-  if (skillPoints >= 60) return { 
-    level: 'G',
-    color: "#FFD700",
-    gradient: "linear-gradient(135deg, #FFD700, #DAA520, #FFD700)",
-    stars: 60,
-    nextLevel: 80,
-    shape: "polygon(50% 0%, 93% 25%, 93% 75%, 50% 100%, 7% 75%, 7% 25%)" // Gold shield
-  };
-  return { 
-    level: 'S',
+
+  if (skillPoints >= 100)
+    return {
+      level: "D",
+      color: "#B9F2FF",
+      gradient: "linear-gradient(135deg, #B9F2FF, #00BFFF, #B9F2FF)",
+      stars: 100,
+      nextLevel: null,
+      shape: "polygon(50% 0%, 100% 38%, 82% 100%, 18% 100%, 0% 38%)", // Diamond shape
+    };
+  if (skillPoints >= 80)
+    return {
+      level: "P",
+      color: "#E6E6FA",
+      gradient: "linear-gradient(135deg, #E6E6FA, #9370DB, #E6E6FA)",
+      stars: 80,
+      nextLevel: 100,
+      shape: "polygon(50% 0%, 90% 20%, 100% 60%, 75% 100%, 25% 100%, 0% 60%, 10% 20%)", // Platinum shield
+    };
+  if (skillPoints >= 60)
+    return {
+      level: "G",
+      color: "#FFD700",
+      gradient: "linear-gradient(135deg, #FFD700, #DAA520, #FFD700)",
+      stars: 60,
+      nextLevel: 80,
+      shape: "polygon(50% 0%, 93% 25%, 93% 75%, 50% 100%, 7% 75%, 7% 25%)", // Gold shield
+    };
+  return {
+    level: "S",
     color: "#C0C0C0",
     gradient: "linear-gradient(135deg, #C0C0C0, #808080, #C0C0C0)",
     stars: 0,
     nextLevel: 60,
-    shape: "polygon(20% 0%, 80% 0%, 100% 20%, 100% 80%, 80% 100%, 20% 100%, 0% 80%, 0% 20%)" // Silver shield
+    shape: "polygon(20% 0%, 80% 0%, 100% 20%, 100% 80%, 80% 100%, 20% 100%, 0% 80%, 0% 20%)", // Silver shield
   };
 };
 
@@ -223,7 +226,8 @@ function AdminProfile() {
                         </Grid>
                         <Grid item xs={6}>
                           <MDTypography variant="body2" color="text">
-                            Customer Satisfaction: {formData.performanceMetrics.customerSatisfaction}/5 {" "}
+                            Customer Satisfaction:{" "}
+                            {formData.performanceMetrics.customerSatisfaction}/5{" "}
                           </MDTypography>
                         </Grid>
                         <Grid item xs={6}>
@@ -233,7 +237,8 @@ function AdminProfile() {
                         </Grid>
                         <Grid item xs={12}>
                           <MDTypography variant="caption" color="text">
-                            Last Updated: {new Date(formData.performanceMetrics.lastUpdated).toLocaleString()} {" "}
+                            Last Updated:{" "}
+                            {new Date(formData.performanceMetrics.lastUpdated).toLocaleString()}{" "}
                           </MDTypography>
                         </Grid>
                       </Grid>
@@ -281,7 +286,9 @@ function AdminProfile() {
                     sx={{
                       width: "120px",
                       height: "120px",
-                      background: levelInfo.gradient || `linear-gradient(135deg, ${levelInfo.color}, ${levelInfo.color}88)`,
+                      background:
+                        levelInfo.gradient ||
+                        `linear-gradient(135deg, ${levelInfo.color}, ${levelInfo.color}88)`,
                       clipPath: levelInfo.shape,
                       border: "3px solid white",
                       boxShadow: "0 4px 20px rgba(0,0,0,0.1)",

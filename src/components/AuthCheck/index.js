@@ -8,10 +8,7 @@ function AuthCheck({ children }) {
 
   useEffect(() => {
     const checkAuth = async () => {
-      
-      
       // const token = localStorage.getItem("access_token");
-
       // if (isAuthPage && token) {
       //   console.log("in auth page and token found");
       //   try {
@@ -20,7 +17,6 @@ function AuthCheck({ children }) {
       //         Authorization: `Bearer ${token}`,
       //       },
       //     });
-
       //     if (response.status === 200) {
       //       const userData = await response.json();
       //       localStorage.setItem(
@@ -43,7 +39,6 @@ function AuthCheck({ children }) {
       //   }
       //   return;
       // }
-
       // // If we're not on an auth page and don't have a token, redirect to sign-in
       // if (!isAuthPage && !token) {
       //   // Only redirect if we're not already on the sign-in page
@@ -53,7 +48,6 @@ function AuthCheck({ children }) {
       //   // navigate("/authentication/sign-in");
       //   return;
       // }
-
       // // If we have a token and we're not on an auth page, verify it
       // if (!isAuthPage && token) {
       //   console.log("not in auth page and token found");
@@ -63,7 +57,6 @@ function AuthCheck({ children }) {
       //         Authorization: `Bearer ${token}`,
       //       },
       //     });
-
       //     if (response.status === 200) {
       //       const userData = await response.json();
       //       localStorage.setItem(
@@ -90,7 +83,6 @@ function AuthCheck({ children }) {
       //     }
       //   }
       // }
-      
     };
 
     checkAuth();

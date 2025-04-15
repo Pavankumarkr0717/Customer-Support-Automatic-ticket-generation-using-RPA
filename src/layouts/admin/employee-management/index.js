@@ -280,4 +280,4 @@ function EmployeeManagement() {
   );
 }
 
-export default EmployeeManagement; 
+export default EmployeeManagement;

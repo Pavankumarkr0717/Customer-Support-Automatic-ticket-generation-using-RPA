@@ -56,11 +56,11 @@ function TicketManagement() {
     const updatePerformance = () => {
       const oneWeekAgo = new Date();
       oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
-      
-      const updatedEmployees = employees.map((employee) => 
+
+      const updatedEmployees = employees.map((employee) =>
         updateEmployeePerformance(employee, tickets, oneWeekAgo, new Date())
       );
-      
+
       setEmployees(updatedEmployees);
     };
 
@@ -82,7 +82,7 @@ function TicketManagement() {
   const handleAssignTicket = (ticketId, employeeName) => {
     const ticket = tickets.find((t) => t.id === ticketId);
     const employeeData = employees.find((e) => e.name === employeeName);
-    
+
     if (!ticket || !employeeData) {
       setNotification({
         open: true,
@@ -108,7 +108,7 @@ function TicketManagement() {
               ...t,
               assignedTo: employeeName,
               status: "In Progress",
-              assignedAt: new Date().toISOString()
+              assignedAt: new Date().toISOString(),
             }
           : t
       )
@@ -129,20 +129,20 @@ function TicketManagement() {
           const updatedTicket = {
             ...ticket,
             status,
-            statusUpdatedAt: new Date().toISOString()
+            statusUpdatedAt: new Date().toISOString(),
           };
-          
+
           if (status === "Resolved") {
             updatedTicket.resolvedAt = new Date().toISOString();
             updatedTicket.customerSatisfaction = Math.floor(Math.random() * 5) + 1;
           }
-          
+
           return updatedTicket;
         }
         return ticket;
       })
     );
-    
+
     setNotification({
       open: true,
       message: `Status updated to ${status}`,
@@ -194,7 +194,7 @@ function TicketManagement() {
     }
 
     const nextLevelEmployee = employees.find((e) => e.slaLevel === nextSlaLevel);
-    
+
     if (nextLevelEmployee) {
       setTickets((prevTickets) =>
         prevTickets.map((t) =>
@@ -298,12 +298,7 @@ function TicketManagement() {
         </MDBox>
       ),
       actions: (
-        <MDButton
-          variant="text"
-          color="info"
-          size="small"
-          onClick={(e) => openMenu(e, ticket.id)}
-        >
+        <MDButton variant="text" color="info" size="small" onClick={(e) => openMenu(e, ticket.id)}>
           <Icon>more_vert</Icon>
         </MDButton>
       ),
@@ -368,9 +363,7 @@ function TicketManagement() {
         <MenuItem onClick={() => handleUpdateStatus(selectedTicket, "Resolved")}>
           Mark as Resolved
         </MenuItem>
-        <MenuItem onClick={() => handleEscalateTicket(selectedTicket)}>
-          Escalate Ticket
-        </MenuItem>
+        <MenuItem onClick={() => handleEscalateTicket(selectedTicket)}>Escalate Ticket</MenuItem>
       </Menu>
       <MDSnackbar
         color={notification.type}

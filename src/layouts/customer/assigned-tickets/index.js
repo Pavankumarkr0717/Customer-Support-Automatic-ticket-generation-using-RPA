@@ -4,7 +4,6 @@ import MDTypography from "components/MDTypography";
 import DashboardLayout from "examples/LayoutContainers/DashboardLayout";
 import DashboardNavbar from "examples/Navbars/DashboardNavbar";
 import Footer from "examples/Footer";
-import DataTable from "examples/Tables/DataTable";
 
 function AssignedTickets() {
   return (
@@ -28,9 +27,7 @@ function AssignedTickets() {
                   My Assigned Tickets
                 </MDTypography>
               </MDBox>
-              <MDBox pt={3}>
-                {/* Table content will go here */}
-              </MDBox>
+              <MDBox pt={3}>{/* Table content will go here */}</MDBox>
             </Card>
           </Grid>
         </Grid>
@@ -40,4 +37,4 @@ function AssignedTickets() {
   );
 }
 
-export default AssignedTickets; 
+export default AssignedTickets;
