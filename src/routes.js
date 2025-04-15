@@ -56,6 +56,7 @@ import TicketManagement from "layouts/admin/ticket-management";
 import AssignedTickets from "layouts/admin/assigned-tickets";
 import CustomerManagement from "layouts/admin/customer-management";
 import AdminProfile from "layouts/admin/profile";
+import EmployeeManagement from "layouts/admin/employee-management";
 
 // Authentication
 import SignIn from "layouts/authentication/sign-in";
@@ -156,6 +157,14 @@ const adminRoutes = [
     icon: <Icon fontSize="small">assignment</Icon>,
     route: "/admin/tickets",
     component: TicketManagement,
+  },
+  {
+    type: "collapse",
+    name: "Employee Management",
+    key: "employee-management",
+    icon: <Icon fontSize="small">people</Icon>,
+    route: "/admin/employees",
+    component: EmployeeManagement,
   },
   {
     type: "collapse",

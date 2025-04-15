@@ -148,27 +148,16 @@ function CustomerManagement() {
               <MDBox
                 mx={2}
                 mt={-3}
-                py={3}
+                py={1.5}
                 px={2}
                 variant="gradient"
                 bgColor="info"
                 borderRadius="lg"
                 coloredShadow="info"
-                display="flex"
-                justifyContent="space-between"
-                alignItems="center"
               >
                 <MDTypography variant="h6" color="white">
                   Customer Management
                 </MDTypography>
-                <MDBox display="flex" gap={2}>
-                  <MDButton variant="gradient" color="dark" size="small">
-                    <Icon>filter_list</Icon>&nbsp; Filter
-                  </MDButton>
-                  <MDButton variant="gradient" color="dark" size="small">
-                    <Icon>download</Icon>&nbsp; Export
-                  </MDButton>
-                </MDBox>
               </MDBox>
               <MDBox pt={3}>
                 <DataTable
