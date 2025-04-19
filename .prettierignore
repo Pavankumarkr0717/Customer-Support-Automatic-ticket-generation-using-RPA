@@ -1,9 +1,15 @@
 build
+coverage
 dist
 node_modules
-coverage
+.git
+.husky
+*.md
+*.yml
+*.yaml
+package-lock.json
+yarn.lock
 .next
 .vercel
-.git
 *.min.js
 *.min.css 

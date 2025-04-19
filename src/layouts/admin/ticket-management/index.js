@@ -1,12 +1,5 @@
-import { useState } from "react";
-
-// @mui material components
-import Grid from "@mui/material/Grid";
-import Card from "@mui/material/Card";
-import Icon from "@mui/material/Icon";
-import Menu from "@mui/material/Menu";
-import MenuItem from "@mui/material/MenuItem";
-import IconButton from "@mui/material/IconButton";
+import { useState, useEffect } from "react";
+import { Grid, Card, Icon, Menu, MenuItem } from "@mui/material";
 
 // Material Dashboard 2 React components
 import MDBox from "components/MDBox";
@@ -20,7 +13,37 @@ import DashboardNavbar from "examples/Navbars/DashboardNavbar";
 import Footer from "examples/Footer";
 import DataTable from "examples/Tables/DataTable";
 
+// Performance tracking utilities
+import { updateEmployeePerformance } from "utils/performanceTracker";
+
+// Sample data for demonstration
+const initialTickets = [
+  {
+    id: "TK001",
+    subject: "System Outage",
+    priority: "High",
+    status: "Open",
+    customer: "John Doe",
+    slaLevel: "Platinum",
+    assignedTo: "John Smith",
+    createdAt: "2024-03-15 10:00",
+    deadline: "2024-03-15 14:00",
+    customerSatisfaction: 0,
+  },
+];
+
+// Sample employees data with initial performance metrics
+const initialEmployees = [
+  { name: "John Smith", slaLevel: "Platinum" },
+  { name: "Sarah Johnson", slaLevel: "Gold" },
+  { name: "Mike Wilson", slaLevel: "Silver" },
+  { name: "Emily Brown", slaLevel: "Bronze" },
+];
+
 function TicketManagement() {
+  const [tickets, setTickets] = useState(initialTickets);
+  const [employees, setEmployees] = useState(initialEmployees);
+  const [selectedTicket, setSelectedTicket] = useState(null);
   const [menu, setMenu] = useState(null);
   const [notification, setNotification] = useState({
     open: false,
@@ -28,90 +51,258 @@ function TicketManagement() {
     type: "success",
   });
 
-  const openMenu = (event) => setMenu(event.currentTarget);
-  const closeMenu = () => setMenu(null);
+  // Update employee performance weekly
+  useEffect(() => {
+    const updatePerformance = () => {
+      const oneWeekAgo = new Date();
+      oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
 
-  const handleStatusChange = (status) => {
-    closeMenu();
+      const updatedEmployees = employees.map((employee) =>
+        updateEmployeePerformance(employee, tickets, oneWeekAgo, new Date())
+      );
+
+      setEmployees(updatedEmployees);
+    };
+
+    // Update performance every week
+    const interval = setInterval(updatePerformance, 7 * 24 * 60 * 60 * 1000);
+    return () => clearInterval(interval);
+  }, [tickets, employees]);
+
+  const openMenu = (event, ticketId) => {
+    setSelectedTicket(ticketId);
+    setMenu(event.currentTarget);
+  };
+
+  const closeMenu = () => {
+    setSelectedTicket(null);
+    setMenu(null);
+  };
+
+  const handleAssignTicket = (ticketId, employeeName) => {
+    const ticket = tickets.find((t) => t.id === ticketId);
+    const employeeData = employees.find((e) => e.name === employeeName);
+
+    if (!ticket || !employeeData) {
+      setNotification({
+        open: true,
+        message: "Invalid ticket or employee selection",
+        type: "error",
+      });
+      return;
+    }
+
+    if (employeeData.slaLevel !== ticket.slaLevel) {
+      setNotification({
+        open: true,
+        message: `Cannot assign ticket: Employee SLA level (${employeeData.slaLevel}) does not match ticket SLA level (${ticket.slaLevel})`,
+        type: "error",
+      });
+      return;
+    }
+
+    setTickets((prevTickets) =>
+      prevTickets.map((t) =>
+        t.id === ticketId
+          ? {
+              ...t,
+              assignedTo: employeeName,
+              status: "In Progress",
+              assignedAt: new Date().toISOString(),
+            }
+          : t
+      )
+    );
+
     setNotification({
       open: true,
-      message: `Ticket status updated to ${status}`,
+      message: `Ticket assigned to ${employeeName}`,
       type: "success",
     });
+    closeMenu();
   };
 
-  const handleCloseNotification = () => {
-    setNotification({ ...notification, open: false });
+  const handleUpdateStatus = (ticketId, status) => {
+    setTickets((prevTickets) =>
+      prevTickets.map((ticket) => {
+        if (ticket.id === ticketId) {
+          const updatedTicket = {
+            ...ticket,
+            status,
+            statusUpdatedAt: new Date().toISOString(),
+          };
+
+          if (status === "Resolved") {
+            updatedTicket.resolvedAt = new Date().toISOString();
+            updatedTicket.customerSatisfaction = Math.floor(Math.random() * 5) + 1;
+          }
+
+          return updatedTicket;
+        }
+        return ticket;
+      })
+    );
+
+    setNotification({
+      open: true,
+      message: `Status updated to ${status}`,
+      type: "success",
+    });
+    closeMenu();
   };
 
-  const renderMenu = (
-    <Menu
-      anchorEl={menu}
-      open={Boolean(menu)}
-      onClose={closeMenu}
-      keepMounted
-      anchorOrigin={{ vertical: "bottom", horizontal: "left" }}
-      transformOrigin={{ vertical: "top", horizontal: "left" }}
-    >
-      <MenuItem onClick={() => handleStatusChange("In Progress")}>In Progress</MenuItem>
-      <MenuItem onClick={() => handleStatusChange("Resolved")}>Resolved</MenuItem>
-      <MenuItem onClick={() => handleStatusChange("Closed")}>Closed</MenuItem>
-    </Menu>
-  );
+  const handleEscalateTicket = (ticketId) => {
+    const ticket = tickets.find((t) => t.id === ticketId);
+    if (!ticket) {
+      setNotification({
+        open: true,
+        message: "Invalid ticket selection",
+        type: "error",
+      });
+      return;
+    }
 
-  const ticketsTableData = {
+    const currentEmployee = employees.find((e) => e.name === ticket.assignedTo);
+    if (!currentEmployee) {
+      setNotification({
+        open: true,
+        message: "Ticket must be assigned before escalation",
+        type: "error",
+      });
+      return;
+    }
+
+    const currentSlaLevel = currentEmployee.slaLevel;
+    let nextSlaLevel;
+    switch (currentSlaLevel) {
+      case "Bronze":
+        nextSlaLevel = "Silver";
+        break;
+      case "Silver":
+        nextSlaLevel = "Gold";
+        break;
+      case "Gold":
+        nextSlaLevel = "Platinum";
+        break;
+      default:
+        setNotification({
+          open: true,
+          message: "Ticket is already at highest SLA level",
+          type: "warning",
+        });
+        return;
+    }
+
+    const nextLevelEmployee = employees.find((e) => e.slaLevel === nextSlaLevel);
+
+    if (nextLevelEmployee) {
+      setTickets((prevTickets) =>
+        prevTickets.map((t) =>
+          t.id === ticketId
+            ? {
+                ...t,
+                assignedTo: nextLevelEmployee.name,
+                status: "Escalated",
+                slaLevel: nextSlaLevel,
+                escalationHistory: [
+                  ...(t.escalationHistory || []),
+                  {
+                    from: currentEmployee.name,
+                    to: nextLevelEmployee.name,
+                    timestamp: new Date().toISOString(),
+                    reason: "Unable to resolve at current level",
+                  },
+                ],
+              }
+            : t
+        )
+      );
+      setNotification({
+        open: true,
+        message: `Ticket escalated to ${nextLevelEmployee.name} (${nextSlaLevel})`,
+        type: "info",
+      });
+    } else {
+      setNotification({
+        open: true,
+        message: "No higher level employee available for escalation",
+        type: "error",
+      });
+    }
+    closeMenu();
+  };
+
+  const ticketsData = {
     columns: [
       { Header: "Ticket ID", accessor: "id", width: "10%" },
+      { Header: "Subject", accessor: "subject", width: "20%" },
+      { Header: "Priority", accessor: "priority", width: "10%" },
+      { Header: "Status", accessor: "status", width: "10%" },
       { Header: "Customer", accessor: "customer", width: "15%" },
-      { Header: "Subject", accessor: "subject", width: "25%" },
-      { Header: "Created", accessor: "created", width: "15%" },
-      { Header: "Status", accessor: "status", width: "15%" },
-      { Header: "Actions", accessor: "actions", width: "20%" },
+      { Header: "SLA Level", accessor: "slaLevel", width: "10%" },
+      { Header: "Assigned To", accessor: "assignedTo", width: "15%" },
+      { Header: "Timeline", accessor: "timeline", width: "10%" },
+      { Header: "Actions", accessor: "actions", width: "10%" },
     ],
-    rows: [
-      {
-        id: "TK001",
-        customer: "John Doe",
-        subject: "Refund Request for Booking #BK001",
-        created: "2024-03-20",
-        status: (
-          <MDTypography variant="caption" color="info" fontWeight="medium">
-            Open
+    rows: tickets.map((ticket) => ({
+      id: ticket.id,
+      subject: ticket.subject,
+      priority: (
+        <MDTypography
+          variant="caption"
+          color={
+            ticket.priority === "High"
+              ? "error"
+              : ticket.priority === "Medium"
+              ? "warning"
+              : "success"
+          }
+          fontWeight="medium"
+        >
+          {ticket.priority}
+        </MDTypography>
+      ),
+      status: (
+        <MDTypography
+          variant="caption"
+          color={
+            ticket.status === "Open"
+              ? "error"
+              : ticket.status === "In Progress"
+              ? "warning"
+              : ticket.status === "Escalated"
+              ? "info"
+              : "success"
+          }
+          fontWeight="medium"
+        >
+          {ticket.status}
+        </MDTypography>
+      ),
+      customer: ticket.customer,
+      slaLevel: ticket.slaLevel,
+      assignedTo: ticket.assignedTo || "Unassigned",
+      timeline: (
+        <MDBox>
+          <MDTypography variant="caption" display="block">
+            Created: {new Date(ticket.createdAt).toLocaleString()}
           </MDTypography>
-        ),
-        actions: (
-          <MDBox display="flex" alignItems="center">
-            <MDButton variant="text" color="info" size="small">
-              View
-            </MDButton>
-            <IconButton onClick={openMenu} size="small">
-              <Icon>more_vert</Icon>
-            </IconButton>
-          </MDBox>
-        ),
-      },
-      {
-        id: "TK002",
-        customer: "Jane Smith",
-        subject: "Change Travel Date",
-        created: "2024-03-19",
-        status: (
-          <MDTypography variant="caption" color="warning" fontWeight="medium">
-            In Progress
+          <MDTypography variant="caption" display="block">
+            Deadline: {new Date(ticket.deadline).toLocaleString()}
           </MDTypography>
-        ),
-        actions: (
-          <MDBox display="flex" alignItems="center">
-            <MDButton variant="text" color="info" size="small">
-              View
-            </MDButton>
-            <IconButton onClick={openMenu} size="small">
-              <Icon>more_vert</Icon>
-            </IconButton>
-          </MDBox>
-        ),
-      },
-    ],
+          {ticket.escalationHistory && (
+            <MDTypography variant="caption" display="block" color="info">
+              Escalated: {ticket.escalationHistory.length} times
+            </MDTypography>
+          )}
+        </MDBox>
+      ),
+      actions: (
+        <MDButton variant="text" color="info" size="small" onClick={(e) => openMenu(e, ticket.id)}>
+          <Icon>more_vert</Icon>
+        </MDButton>
+      ),
+    })),
   };
 
   return (
@@ -124,36 +315,24 @@ function TicketManagement() {
               <MDBox
                 mx={2}
                 mt={-3}
-                py={3}
+                py={1.5}
                 px={2}
                 variant="gradient"
                 bgColor="info"
                 borderRadius="lg"
                 coloredShadow="info"
-                display="flex"
-                justifyContent="space-between"
-                alignItems="center"
               >
                 <MDTypography variant="h6" color="white">
                   Ticket Management
                 </MDTypography>
-                <MDBox display="flex" gap={2}>
-                  <MDButton variant="gradient" color="dark" size="small">
-                    <Icon>filter_list</Icon>&nbsp; Filter
-                  </MDButton>
-                  <MDButton variant="gradient" color="dark" size="small">
-                    <Icon>download</Icon>&nbsp; Export
-                  </MDButton>
-                </MDBox>
               </MDBox>
               <MDBox pt={3}>
                 <DataTable
-                  table={ticketsTableData}
-                  isSorted={true}
-                  entriesPerPage={true}
-                  showTotalEntries={true}
+                  table={ticketsData}
+                  isSorted={false}
+                  entriesPerPage={false}
+                  showTotalEntries={false}
                   noEndBorder
-                  canSearch
                 />
               </MDBox>
             </Card>
@@ -161,15 +340,39 @@ function TicketManagement() {
         </Grid>
       </MDBox>
       <Footer />
-      {renderMenu}
+      <Menu
+        anchorEl={menu}
+        anchorOrigin={{ vertical: "bottom", horizontal: "left" }}
+        transformOrigin={{ vertical: "top", horizontal: "left" }}
+        open={Boolean(menu)}
+        onClose={closeMenu}
+        keepMounted
+      >
+        {employees.map((employee) => (
+          <MenuItem
+            key={employee.name}
+            onClick={() => handleAssignTicket(selectedTicket, employee.name)}
+          >
+            Assign to {employee.name} ({employee.slaLevel})
+          </MenuItem>
+        ))}
+        <MenuItem divider />
+        <MenuItem onClick={() => handleUpdateStatus(selectedTicket, "In Progress")}>
+          Mark as In Progress
+        </MenuItem>
+        <MenuItem onClick={() => handleUpdateStatus(selectedTicket, "Resolved")}>
+          Mark as Resolved
+        </MenuItem>
+        <MenuItem onClick={() => handleEscalateTicket(selectedTicket)}>Escalate Ticket</MenuItem>
+      </Menu>
       <MDSnackbar
         color={notification.type}
         icon={notification.type === "success" ? "check" : "warning"}
         title={notification.type === "success" ? "Success" : "Error"}
         content={notification.message}
         open={notification.open}
-        onClose={handleCloseNotification}
-        close={handleCloseNotification}
+        onClose={() => setNotification({ ...notification, open: false })}
+        close={() => setNotification({ ...notification, open: false })}
         bgWhite
       />
     </DashboardLayout>

@@ -70,7 +70,7 @@ function Bookings() {
               <MDBox
                 mx={2}
                 mt={-3}
-                py={3}
+                py={1.5}
                 px={2}
                 variant="gradient"
                 bgColor="info"
@@ -81,7 +81,7 @@ function Bookings() {
                 alignItems="center"
               >
                 <MDTypography variant="h6" color="white">
-                  My Bookings
+                  My Tickets
                 </MDTypography>
                 <MDButton variant="gradient" color="dark">
                   <Icon sx={{ fontWeight: "bold" }}>add</Icon>
